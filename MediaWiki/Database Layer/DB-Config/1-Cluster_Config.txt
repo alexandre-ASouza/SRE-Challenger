@@ -31,3 +31,24 @@
       apt:
         update_cache: yes
         cache_valid_time: 86400
+
+    - name: Install Pip
+      when: inventory_hostname in groups['bootstrap-node']
+      apt:
+        pkg:
+        - python-pip
+
+    - name: Install pymysql
+      when: inventory_hostname in groups['bootstrap-node']
+      shell: /usr/bin/pip install pymysql
+
+    - name: Disable apparmor
+      file:
+        src: /etc/apparmor.d/usr.sbin.mysqld
+        dest: /etc/apparmor.d/disable/usr.sbin.mysqld
+        state: link
+      ignore_errors: yes
+        
+    - name: Remove SQL apparmor definition
+      shell: /sbin/apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+      ignore_errors: yes
