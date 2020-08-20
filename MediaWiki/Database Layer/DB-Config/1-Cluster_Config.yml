@@ -73,3 +73,17 @@
           # Galera Synchronization Configuration
           wsrep_sst_method=rsync
           # Galera Node Configuration
+          
+    - name: wsrep_node_address >> /etc/mysql/conf.d/galera.cnf
+      shell: echo wsrep_node_address="`hostname -I`" >> /etc/mysql/conf.d/galera.cnf
+
+    - name: wsrep_node_name >> /etc/mysql/conf.d/galera.cnf
+      shell: echo wsrep_node_name="`hostname`" >> /etc/mysql/conf.d/galera.cnf
+
+    - name: Bootstrap first node
+      when: inventory_hostname in groups['bootstrap-node']
+      shell: mysqld_bootstrap
+    
+    - name: Starting Nodes
+      when: inventory_hostname in groups['secondary-node']
+      shell: systemctl start mysql
