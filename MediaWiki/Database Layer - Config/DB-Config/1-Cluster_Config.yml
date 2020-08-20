@@ -87,3 +87,6 @@
     - name: Starting Nodes
       when: inventory_hostname in groups['secondary-node']
       shell: systemctl start mysql
+      
+    - name: Enable mysql
+      shell: systemctl enable mysql
