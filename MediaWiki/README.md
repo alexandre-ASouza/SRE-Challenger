@@ -23,3 +23,5 @@
 <p>DbWiki-Node2 - 192.168.1.52</p>
 
 ============================================================
+
+![alt text](MediaWiki/Database Layer - Config/WikiVPC.png)
