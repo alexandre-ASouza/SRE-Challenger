@@ -1,0 +1,19 @@
+- hosts: dbwiki-nodes
+  remote_user: ubuntu
+  become: true
+  
+  tasks:
+    - name: Create a new database 
+      when: inventory_hostname in groups['bootstrap-node-teste']
+      mysql_db:
+        name: wikidb
+        state: present
+  
+    - name: Create wikiuser
+      when: inventory_hostname in groups['bootstrap-node-teste']
+      mysql_user:
+        name: wikiuser
+        password: mediawiki123
+        host: '%'
+        priv: 'wikidb.%:ALL,GRANT'
+        state: present
