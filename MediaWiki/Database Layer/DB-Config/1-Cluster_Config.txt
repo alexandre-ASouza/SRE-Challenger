@@ -1,0 +1,33 @@
+- hosts: dbwiki-nodes
+  remote_user: ubuntu
+  become: true
+  
+  tasks:
+    - name: Add apt key
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: BC19DDBA
+
+    - name: Add repo file
+      blockinfile:
+        dest: /etc/apt/sources.list.d/galera.list
+        create: yes
+        mode: 0644
+        content: |
+          deb http://releases.galeracluster.com/mysql-wsrep-5.7/ubuntu bionic main
+          deb http://releases.galeracluster.com/galera-3/ubuntu bionic main
+
+    - name: Add repo preference file
+      blockinfile:
+        dest: /etc/apt/preferences.d/galera.pref
+        create: yes
+        mode: 0644
+        content: |
+          Package: *
+          Pin: origin releases.galeracluster.com
+          Pin-Priority: 1001
+
+    - name: VM update
+      apt:
+        update_cache: yes
+        cache_valid_time: 86400
