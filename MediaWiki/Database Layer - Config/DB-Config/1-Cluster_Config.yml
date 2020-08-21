@@ -42,6 +42,12 @@
       when: inventory_hostname in groups['bootstrap-node']
       shell: /usr/bin/pip install pymysql
 
+    - name: Install MySql/Galera-Cluster
+      apt:
+        pkg:
+        - galera-3
+        - mysql-wsrep-5.7
+
     - name: Disable apparmor
       file:
         src: /etc/apparmor.d/usr.sbin.mysqld
