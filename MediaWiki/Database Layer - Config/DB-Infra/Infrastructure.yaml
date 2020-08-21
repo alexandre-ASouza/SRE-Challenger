@@ -1,0 +1,686 @@
+Resources:
+  WikiVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 192.168.1.0/26
+      InstanceTenancy: default
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'false'
+      Tags:
+        - Key: Name
+          Value: WikiVPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 4f80a6f1-1df3-48ce-a5ce-5b9eb2fe4c38
+  DbSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.48/28
+      AvailabilityZone: sa-east-1a
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: DbSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 101dbb16-ee6d-4a68-9052-8228a96187a4
+  AppSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.0/28
+      AvailabilityZone: sa-east-1a
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: AppSubnet1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: cfda9fba-0ed6-459e-ae30-a62a0e211b2b
+  AppSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.16/28
+      AvailabilityZone: sa-east-1c
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: AppSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 17e2d16b-f84d-4cc3-be9d-e06d4c573c25
+  DbSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.32/28
+      AvailabilityZone: sa-east-1c
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: DbSubnet1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 1d054e4f-b14c-4ba3-829e-fcc766da7fca
+  WikiInternet:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Wiki_Internet
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ee89c89f-2599-46a5-830d-f2e745af8761
+  DhcpEc2DNS:
+    Type: 'AWS::EC2::DHCPOptions'
+    Properties:
+      DomainName: sa-east-1.compute.internal
+      DomainNameServers:
+        - AmazonProvidedDNS
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 8dc9e5e5-6f6e-4c81-9e2e-bd5d54fc9b72
+  NetACL1:
+    Type: 'AWS::EC2::NetworkAcl'
+    Properties:
+      VpcId: !Ref WikiVPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 1117ac80-433f-4d69-bf81-b7e7faa5ffdf
+  RTDB:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: RT-DB
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 2e0f7314-f0b4-44b7-a445-90ba8576b2a0
+  RTInternet:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: RTInternet
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: db538e69-1cd0-4768-b92c-07e4a8383583
+  VMTools:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      DisableApiTermination: 'false'
+      InstanceInitiatedShutdownBehavior: stop
+      ImageId: ami-08caf314e5abfbef4
+      InstanceType: t2.micro
+      KeyName: Key_Challenger
+      Monitoring: 'false'
+      Tags:
+        - Key: Name
+          Value: Tools
+      NetworkInterfaces:
+        - DeleteOnTermination: 'true'
+          Description: Primary network interface
+          DeviceIndex: 0
+          SubnetId: !Ref AppSubnet1
+          PrivateIpAddresses:
+            - PrivateIpAddress: 192.168.1.12
+              Primary: 'true'
+          GroupSet:
+            - !Ref sgWikiApp
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 0417ea8d-8ece-4ebe-be4a-aea49c5745ae
+  DBwikiNode2:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      DisableApiTermination: 'false'
+      InstanceInitiatedShutdownBehavior: stop
+      ImageId: ami-08caf314e5abfbef4
+      InstanceType: t2.micro
+      KeyName: Key_Challenger
+      Monitoring: 'false'
+      Tags:
+        - Key: Name
+          Value: DbWiki-Node2
+      NetworkInterfaces:
+        - DeleteOnTermination: 'true'
+          Description: Primary network interface
+          DeviceIndex: 0
+          SubnetId: !Ref DbSubnet2
+          PrivateIpAddresses:
+            - PrivateIpAddress: 192.168.1.52
+              Primary: 'true'
+          GroupSet:
+            - !Ref sgWikiDb
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: a8c43409-30b9-4c5d-b366-1724545701b3
+  DBwikiNode1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      DisableApiTermination: 'false'
+      InstanceInitiatedShutdownBehavior: stop
+      ImageId: ami-08caf314e5abfbef4
+      InstanceType: t2.micro
+      KeyName: Key_Challenger
+      Monitoring: 'false'
+      Tags:
+        - Key: Name
+          Value: DbWiki-Node1
+      NetworkInterfaces:
+        - DeleteOnTermination: 'true'
+          Description: Primary network interface
+          DeviceIndex: 0
+          SubnetId: !Ref DbSubnet1
+          PrivateIpAddresses:
+            - PrivateIpAddress: 192.168.1.40
+              Primary: 'true'
+          GroupSet:
+            - !Ref sgWikiDb
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 049cb747-f9fb-4f0a-b5f3-1c3eb1db2b5a
+  DBwikiNode3:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      DisableApiTermination: 'false'
+      InstanceInitiatedShutdownBehavior: stop
+      ImageId: ami-08caf314e5abfbef4
+      InstanceType: t2.micro
+      KeyName: Key_Challenger
+      Monitoring: 'false'
+      Tags:
+        - Key: Name
+          Value: DbWiki-Node3
+      NetworkInterfaces:
+        - DeleteOnTermination: 'true'
+          Description: Primary network interface
+          DeviceIndex: 0
+          SubnetId: !Ref DbSubnet1
+          PrivateIpAddresses:
+            - PrivateIpAddress: 192.168.1.36
+              Primary: 'true'
+          GroupSet:
+            - !Ref sgWikiDb
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 8671d87d-25a4-467c-9a2b-5bc7dd193ee2
+  topicWiki:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      DisplayName: Wiki-Topic
+      Subscription:
+        - Endpoint: alexandre.souza73@etec.sp.gov.br
+          Protocol: email
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ad3d20af-e57b-453d-bb99-6c30a487b715
+  sgWikiDb:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: SG DB 3306
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: WikiDb_SG
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 31633a87-7895-49fc-be19-f41a6a5decf6
+  sgWikiApp:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: default VPC security group
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: WikiApp_SG
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: a08e0015-4301-4a05-a676-d7a5e6b176d8
+  snspolicyWikiTopic:
+    Type: 'AWS::SNS::TopicPolicy'
+    Properties:
+      Topics:
+        - !Ref topicWiki
+      PolicyDocument:
+        Version: 2008-10-17
+        Id: __default_policy_ID
+        Statement:
+          - Sid: __default_statement_ID
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action:
+              - 'SNS:Publish'
+              - 'SNS:RemovePermission'
+              - 'SNS:SetTopicAttributes'
+              - 'SNS:DeleteTopic'
+              - 'SNS:ListSubscriptionsByTopic'
+              - 'SNS:GetTopicAttributes'
+              - 'SNS:Receive'
+              - 'SNS:AddPermission'
+              - 'SNS:Subscribe'
+            Resource: !Ref topicWiki
+            Condition:
+              StringEquals:
+                'AWS:SourceOwner': '553472697617'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 0992de9f-f84b-4442-837d-b55a35665825
+  alarmDBNodeProblemSaEast1a:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      ActionsEnabled: 'true'
+      AlarmDescription: There's a problem with Wiki-DB Cluster.
+      ComparisonOperator: LessThanThreshold
+      EvaluationPeriods: '1'
+      MetricName: HealthyHostCount
+      Namespace: AWS/NetworkELB
+      Period: '300'
+      Statistic: Minimum
+      Threshold: '1.0'
+      AlarmActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      Dimensions:
+        - Name: TargetGroup
+          Value: targetgroup/TG-WikiDb/d1f9d61401639fc8
+        - Name: AvailabilityZone
+          Value: sa-east-1a
+        - Name: LoadBalancer
+          Value: net/LB-DB-Wiki/40b0699db792bff9
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 842a7062-2ab7-4a6b-b1ea-89b0a5e75fff
+  alarmDBNodeProblemSaEast1c:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      ActionsEnabled: 'true'
+      AlarmDescription: There's a problem with Wiki-DB Cluster.
+      ComparisonOperator: LessThanThreshold
+      EvaluationPeriods: '1'
+      MetricName: HealthyHostCount
+      Namespace: AWS/NetworkELB
+      Period: '300'
+      Statistic: Minimum
+      Threshold: '1.0'
+      AlarmActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      Dimensions:
+        - Name: TargetGroup
+          Value: targetgroup/TG-WikiDb/d1f9d61401639fc8
+        - Name: AvailabilityZone
+          Value: sa-east-1c
+        - Name: LoadBalancer
+          Value: net/LB-DB-Wiki/40b0699db792bff9
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 44100775-d4a5-454e-8297-6a2248538b45
+  alarmDbWikiNode1CPUUtilization:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      ActionsEnabled: 'true'
+      AlarmDescription: Created from EC2 Console
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: '1'
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Period: '300'
+      Statistic: Average
+      Threshold: '80.0'
+      AlarmActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      InsufficientDataActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      Dimensions:
+        - Name: InstanceId
+          Value: i-0af5645978423a404
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b2de83f1-6e33-4f3e-bf29-931515323999
+  alarmDbWikiNode2CPUUtilization:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      ActionsEnabled: 'true'
+      AlarmDescription: Created from EC2 Console
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: '1'
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Period: '300'
+      Statistic: Average
+      Threshold: '80.0'
+      AlarmActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      InsufficientDataActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      Dimensions:
+        - Name: InstanceId
+          Value: i-0d04180c454aec663
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: a203a51d-6764-4f73-be95-5a75ba3c3def
+  alarmDbWikiNode3CPUUtilization:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      ActionsEnabled: 'true'
+      AlarmDescription: Created from EC2 Console
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: '1'
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Period: '300'
+      Statistic: Average
+      Threshold: '80.0'
+      AlarmActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      InsufficientDataActions:
+        - 'arn:aws:sns:sa-east-1:553472697617:Wiki-Topic'
+      Dimensions:
+        - Name: InstanceId
+          Value: i-0e0a3e904d4625a9d
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: e6bd1f30-fc16-4e7d-9c85-a7900ff26bc4
+  acl1:
+    Type: 'AWS::EC2::NetworkAclEntry'
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Egress: 'true'
+      Protocol: '-1'
+      RuleAction: allow
+      RuleNumber: '100'
+      NetworkAclId: !Ref NetACL1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 863ee5bc-dd70-4a8d-81f8-37b4d9c9200b
+  acl2:
+    Type: 'AWS::EC2::NetworkAclEntry'
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Protocol: '-1'
+      RuleAction: allow
+      RuleNumber: '100'
+      NetworkAclId: !Ref NetACL1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f1d48041-3565-4c32-a2ac-e3ecb338e429
+  subnetacl1:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetACL1
+      SubnetId: !Ref DbSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: dd086608-4697-4d70-8654-183c89f90217
+  subnetacl2:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetACL1
+      SubnetId: !Ref AppSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: cd8dad8f-ee03-4050-8be4-cdf696af0544
+  subnetacl3:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetACL1
+      SubnetId: !Ref AppSubnet1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 8cf9b267-ec26-423f-824d-85c745c259f7
+  subnetacl4:
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+    Properties:
+      NetworkAclId: !Ref NetACL1
+      SubnetId: !Ref DbSubnet1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 9b6b5e49-4c41-4f86-b20b-5c4e5f2dac8f
+  gw1:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref WikiVPC
+      InternetGatewayId: !Ref WikiInternet
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: e403233a-c948-48f7-b848-185df67e8cfe
+  subnetroute1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTDB
+      SubnetId: !Ref DbSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 412e6780-c0bb-4f45-b3d3-9325b440d1d8
+  subnetroute2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTDB
+      SubnetId: !Ref DbSubnet1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: a8202fba-237d-432a-a192-94ea8fb97c45
+  subnetroute4:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTInternet
+      SubnetId: !Ref AppSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 63c5f7cf-a759-4c2a-82cf-65cf0a8b2969
+  subnetroute5:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTInternet
+      SubnetId: !Ref AppSubnet1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 36a62529-a7c2-4e60-8fb0-9a0f7b63f4d1
+  route1:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTDB
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b404c710-afdb-4970-aa88-b88973c6f85b
+  route2:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTInternet
+      GatewayId: !Ref WikiInternet
+    DependsOn: gw1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: fadd9f67-63dd-4cfb-89fa-7f4f7868106b
+  dchpassoc1:
+    Type: 'AWS::EC2::VPCDHCPOptionsAssociation'
+    Properties:
+      VpcId: !Ref WikiVPC
+      DhcpOptionsId: !Ref DhcpEc2DNS
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5e3fda3c-204f-4fd4-b29e-bad6eaadd2bd
+  ingress1:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: 192.168.1.0/26
+  ingress2:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: tcp
+      FromPort: '4444'
+      ToPort: '4444'
+      CidrIp: 192.168.1.0/26
+  ingress3:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: udp
+      FromPort: '4567'
+      ToPort: '4567'
+      CidrIp: 192.168.1.0/26
+  ingress4:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: tcp
+      FromPort: '4568'
+      ToPort: '4568'
+      CidrIp: 192.168.1.0/26
+  ingress5:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: tcp
+      FromPort: '4567'
+      ToPort: '4567'
+      CidrIp: 192.168.1.0/26
+  ingress6:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: tcp
+      FromPort: '3306'
+      ToPort: '3306'
+      CidrIp: 192.168.1.0/26
+  ingress7:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: icmp
+      FromPort: '-1'
+      ToPort: '-1'
+      CidrIp: 192.168.1.0/26
+  ingress8:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiApp
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 0.0.0.0/0
+  ingress9:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref sgWikiApp
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: 0.0.0.0/0
+  egress1:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      GroupId: !Ref sgWikiDb
+      IpProtocol: '-1'
+      CidrIp: 0.0.0.0/0
+  egress2:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      GroupId: !Ref sgWikiApp
+      IpProtocol: '-1'
+      CidrIp: 0.0.0.0/0
+  NatWikiDBeast1a:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId:
+        'Fn::GetAtt':
+          - NatIP1
+          - AllocationId
+      SubnetId: !Ref AppSubnet2
+      Tags:
+        - Key: Name
+          Value: Nat-wikidb-sa-east-1a
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 86b2efa8-56ef-4843-be4b-b4dc2cffb59f
+  NatIP1:
+    DependsOn:
+      - RTInternet
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: WikiVPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 8cc3159b-f341-4960-ad91-66e787ed38e6
+  NatWikiDBeast1c:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId:
+        'Fn::GetAtt':
+          - NatIP2
+          - AllocationId
+      SubnetId: !Ref AppSubnet1
+      Tags:
+        - Key: Name
+          Value: Nat-wikidb-sa-east-1c
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c1d69823-5778-4295-97fa-a2eff6746c55
+  NatIP2:
+    DependsOn:
+      - RTInternet
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: WikiVPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d78b5d53-ed46-42ff-8a4f-d28f62231a44
+  LBDBTargerGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: LBDBTargerGroup
+      HealthCheckProtocol: TCP
+      HealthCheckPort: traffic-port
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      UnhealthyThresholdCount: 3
+      TargetType: instance
+      Targets:
+        - Id:
+            - !Ref DBwikiNode1
+            - !Ref DBwikiNode2
+            - !Ref DBwikiNode3
+        - 'Fn::GetAtt':
+            - LBDB
+            - LoadBalancerName
+        - Port: 3305
+      Protocol: TCP
+      Port: 3306
+      VpcId: !Ref WikiVPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 386779f2-56d8-45d3-a05c-b56f16034915
+  LBDB:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      LoadBalancerAttributes:
+        Key: load_balancing.cross_zone.enabled
+        Value: true
+      Name: LB-DB-Wiki
+      IpAddressType: ipv4
+      Type: network
+      Scheme: internal
+      SubnetMappings:
+        - 192.168.1.54
+        - 192.168.1.44
+      SecurityGroups:
+        - !Ref sgWikiDb
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 55186159-f8ae-4ecb-a78e-1b4bebce2345
+  LBListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      Protocol: tcp
+      LoadBalancerArn: !Ref LBDB
+      Port: 3306
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ba14f495-8844-45de-9863-573a7c621709
