@@ -15,5 +15,5 @@
         name: wikiuser
         password: mediawiki123
         host: '%'
-        priv: 'wikidb.%:ALL,GRANT'
+        priv: 'wikidb.*:ALL,GRANT'
         state: present
