@@ -27,4 +27,4 @@
 
 ============================================================
 
-![alt text](https://github.com/alexandre-ASouza/SRE-Challenger/blob/master/MediaWiki/Database%20Layer%20-%20Config/Design-WikiVPC.png)
+![alt text](https://github.com/alexandre-ASouza/SRE-Challenger/blob/master/MediaWiki/Design-WikiVPC.png)
