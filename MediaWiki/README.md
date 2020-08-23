@@ -7,12 +7,12 @@
 ## -- AppSubnet1 (192.168.1.0/28 255.255.255.240) - sa-east-1a
 
 <p>Nat-wikidb-sa-east-1c - 192.168.1.4</p>
-<p>EC2 Auto Scaling Group</p>
+<p>EC2 Auto Scaling Group (ASGWikiSubnet1)</p>
 
 ## -- AppSubnet2 (192.168.1.16/28 255.255.255.240) - sa-east-1c
 
 <p>Nat-wikidb-sa-east-1a - 192.168.1.29</p>
-<p>EC2 Auto Scaling Group</p>
+<p>EC2 Auto Scaling Group (ASGWikiSubnet2)</p>
 
 ## -- DbSubnet1 (192.168.1.32/28 255.255.255.240) - sa-east-1c
 
