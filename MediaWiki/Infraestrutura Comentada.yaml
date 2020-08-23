@@ -126,7 +126,7 @@ Resources:
         id: 61da78b7-fe2a-462f-9205-4c23eef1e9bd
 
 ################################################################################
-# Tabela de roteamento dos bancos de dados (RTDB) e para a internet (RTInternet)
+# Tabela de roteamento dos bancos de dados (RTDB) para a internet (RTInternet)
 
   RTDB:
     Type: 'AWS::EC2::RouteTable'
