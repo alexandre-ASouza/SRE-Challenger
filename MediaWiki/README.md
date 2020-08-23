@@ -1,8 +1,6 @@
 ============================================================
 # WikiVPC - 192.168.1.0/26
-
-<p>-  mediawiki_InternetGateway</p>
-<p>- mediawiki-challenger-1182272360.sa-east-1.elb.amazonaws.com</p>
+<p>-URL de acesso: http://mediawiki-challenger-1182272360.sa-east-1.elb.amazonaws.com</p>
 
 ## -- AppSubnet1 (192.168.1.0/28 255.255.255.240) - sa-east-1a
 
