@@ -1,0 +1,1 @@
+## docker pull aledsouza/api-mediawiki:latest
