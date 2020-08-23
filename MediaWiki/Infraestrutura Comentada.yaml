@@ -1,5 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
+
+###########################################
+# Criação das Virtual Private Cloud WikiVPC
+
   WikiVPC:
     Type: 'AWS::EC2::VPC'
     Properties:
@@ -13,42 +17,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 811c0f4d-f060-4588-856a-eea70b09dd20
-  DbSubnet2:
-    Type: 'AWS::EC2::Subnet'
-    Properties:
-      CidrBlock: 192.168.1.48/28
-      AvailabilityZone: sa-east-1a
-      VpcId: !Ref WikiVPC
-      Tags:
-        - Key: Name
-          Value: DbSubnet2
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 7735e8cb-e316-4c7f-b418-2f110c7cf5b5
-  AppSubnet1:
-    Type: 'AWS::EC2::Subnet'
-    Properties:
-      CidrBlock: 192.168.1.0/28
-      AvailabilityZone: sa-east-1a
-      VpcId: !Ref WikiVPC
-      Tags:
-        - Key: Name
-          Value: AppSubnet1
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 9000b017-5ba7-4752-93f7-1600cf1752c4
-  AppSubnet2:
-    Type: 'AWS::EC2::Subnet'
-    Properties:
-      CidrBlock: 192.168.1.16/28
-      AvailabilityZone: sa-east-1c
-      VpcId: !Ref WikiVPC
-      Tags:
-        - Key: Name
-          Value: AppSubnet2
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 8fa66f63-4b30-4f81-befb-90f7fa28f6d5
+
+#################################################################
+# Criação das Subnets (DbSubnet1/DbSubnet2/AppSubnet1/AppSubnet2)
+  
   DbSubnet1:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -61,6 +33,50 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 3d3de0e4-0a68-44ac-88af-d1ace6df4ced
+
+  DbSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.48/28
+      AvailabilityZone: sa-east-1a
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: DbSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 7735e8cb-e316-4c7f-b418-2f110c7cf5b5
+  
+  AppSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.0/28
+      AvailabilityZone: sa-east-1a
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: AppSubnet1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+  
+      id: 9000b017-5ba7-4752-93f7-1600cf1752c4
+  
+  AppSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 192.168.1.16/28
+      AvailabilityZone: sa-east-1c
+      VpcId: !Ref WikiVPC
+      Tags:
+        - Key: Name
+          Value: AppSubnet2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 8fa66f63-4b30-4f81-befb-90f7fa28f6d5
+
+#############################
+# Criação do Internet Gateway
+
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
     Properties:
@@ -70,6 +86,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: a9917355-b7d0-41b3-b6a4-8dd175f0899d
+
+#################
+# DHCP
+
   DhcpVPC:
     Type: 'AWS::EC2::DHCPOptions'
     Properties:
@@ -79,6 +99,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 6bc72ad3-5ffe-4541-962d-53c1e21a3c4c
+
+###################  
+# ACLs
+
   ACLDB:
     Type: 'AWS::EC2::NetworkAcl'
     Properties:
@@ -89,6 +113,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 5a9d737d-6549-4dbe-a409-7522f53337ca
+  
   ACLAPP:
     Type: 'AWS::EC2::NetworkAcl'
     Properties:
@@ -99,6 +124,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 61da78b7-fe2a-462f-9205-4c23eef1e9bd
+
+################################################################################
+# Tabela de roteamento dos bancos de dados (RTDB) e para a internet (RTInternet)
+
   RTDB:
     Type: 'AWS::EC2::RouteTable'
     Properties:
@@ -109,6 +138,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 6fcf1ea1-f36d-4160-90a0-78b43ba997e3
+  
   RTInternet:
     Type: 'AWS::EC2::RouteTable'
     Properties:
@@ -119,6 +149,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: efba8515-7cfd-4864-8494-797c6b319cff
+
+####################################
+# Configurações do AWS Auto Scaling
+
   ASGWikiSubnet1:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
@@ -127,7 +161,7 @@ Resources:
       TargetGroupARNs: !Ref LBAppTargerGroup
       Cooldown: '300'
       DesiredCapacity: '1'
-      HealthCheckGracePeriod: '300'
+      HealthCheckGracePeriod: '120'
       HealthCheckType: EC2
       MaxSize: '2'
       MinSize: '1'
@@ -139,6 +173,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 1f371109-9307-4fa6-a3dd-d293c945feaa
+  
   ASGWikiSubnet2:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
@@ -147,7 +182,7 @@ Resources:
       TargetGroupARNs: !Ref LBAppTargerGroup
       Cooldown: '300'
       DesiredCapacity: '1'
-      HealthCheckGracePeriod: '300'
+      HealthCheckGracePeriod: '120'
       HealthCheckType: EC2
       MaxSize: '2'
       MinSize: '1'
@@ -159,6 +194,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d19ef763-1535-44e6-a306-943ca751f6d6
+
+##############################################
+# Template de execução das VMs Auto Scaling
+
   LCAppSubnet1:
     Type: 'AWS::AutoScaling::LaunchConfiguration'
     Properties:
@@ -179,6 +218,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 63e6935b-0799-409f-a0f1-09c640a7c680
+  
   LCAppSubnet2:
     Type: 'AWS::AutoScaling::LaunchConfiguration'
     Properties:
@@ -199,6 +239,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: afaab81d-945e-45a1-bad5-27f6b418a0da
+
+###############################
+# Criação das máquinas virtuais
+ 
   VMTools:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -225,31 +269,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 912a2996-281c-4d8b-876c-0f837cbe2a34
-  DbWikiNode2:
-    Type: 'AWS::EC2::Instance'
-    Properties:
-      DisableApiTermination: 'false'
-      InstanceInitiatedShutdownBehavior: stop
-      ImageId: ami-08caf314e5abfbef4
-      InstanceType: t2.micro
-      KeyName: Key_Challenger
-      Monitoring: 'false'
-      Tags:
-        - Key: Name
-          Value: DbWiki-Node2
-      NetworkInterfaces:
-        - DeleteOnTermination: 'true'
-          Description: Primary network interface
-          DeviceIndex: 0
-          SubnetId: !Ref DbSubnet2
-          PrivateIpAddresses:
-            - PrivateIpAddress: 192.168.1.52
-              Primary: 'true'
-          GroupSet:
-            - !Ref WikiDbSG
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 6ced5af6-8334-4c30-9d2a-225a380e5ff5
+  
   DbWikiNode1:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -275,6 +295,33 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: acebe4d0-3655-4526-ac15-e28cbc3319b8
+  
+  DbWikiNode2:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      DisableApiTermination: 'false'
+      InstanceInitiatedShutdownBehavior: stop
+      ImageId: ami-08caf314e5abfbef4
+      InstanceType: t2.micro
+      KeyName: Key_Challenger
+      Monitoring: 'false'
+      Tags:
+        - Key: Name
+          Value: DbWiki-Node2
+      NetworkInterfaces:
+        - DeleteOnTermination: 'true'
+          Description: Primary network interface
+          DeviceIndex: 0
+          SubnetId: !Ref DbSubnet2
+          PrivateIpAddresses:
+            - PrivateIpAddress: 192.168.1.52
+              Primary: 'true'
+          GroupSet:
+            - !Ref WikiDbSG
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 6ced5af6-8334-4c30-9d2a-225a380e5ff5
+
   DbWikiNode3:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -300,16 +347,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: a7b369f4-80c7-4700-9a68-17fd8f514fcb
-  WikiTopic:
-    Type: 'AWS::SNS::Topic'
-    Properties:
-      DisplayName: Wiki-Topic
-      Subscription:
-        - Endpoint: alexandre.souza73@etec.sp.gov.br
-          Protocol: email
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: f01a69f8-2008-4191-b80e-b4d29736b5ec
+
+#################
+# Security Groups
+  
   WikiDbSG:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -321,6 +362,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 572a3663-6c87-4900-9bae-97099d0cfbe9
+  
   WikiAppSG:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -332,6 +374,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d7f1b50c-5619-46fa-927f-b1314947344b
+
+##########################################################
+# Configuração do Amazon SNS (Simple Notification Service)
+
   SNSpolicy:
     Type: 'AWS::SNS::TopicPolicy'
     Properties:
@@ -362,6 +408,21 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 05ea1939-74c2-4307-985c-f8a1d5fec85b
+  
+  WikiTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      DisplayName: Wiki-Topic
+      Subscription:
+        - Endpoint: alexandre.souza73@etec.sp.gov.br
+          Protocol: email
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f01a69f8-2008-4191-b80e-b4d29736b5ec
+  
+#######################################
+# Tracking dos alarmes de Scaling Group
+  
   ScaleGroupSize:
     Type: 'AWS::AutoScaling::ScalingPolicy'
     Properties:
@@ -371,6 +432,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 59d59092-9f02-4936-a885-b08bf4ba36e6
+
+##############################################
+# Alarmes de monitoramento dos bancos de dados
+  
   alarmDBNodeProblemSaEast1a:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -395,6 +460,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 9f7f4f23-7971-4f02-ad71-42cdd08d128e
+  
   alarmDBNodeProblemSaEast1c:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -419,6 +485,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 1bcc13af-9a64-46df-88a0-9d35791dcd8f
+  
   alarmDbWikiNode1CPUUtilization:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -441,6 +508,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 382a1821-f04e-4307-ba76-f3e10e112ac9
+  
   alarmDbWikiNode2CPUUtilization:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -463,6 +531,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: f83c6a92-79c9-492a-be2b-4f8c57281014
+  
   alarmDbWikiNode3CPUUtilization:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -485,6 +554,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 497d53d5-9b2e-45b5-ad2a-513c84e70fd4
+
+#####################################################
+# Alarmes associados às regras de Auto-Scaling Groups 
+ 
   alarmTargetTrackingASGWikiSubnet1AlarmHighaf9f0d124baa4a89aeb2015ad72de531:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -508,6 +581,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 4f55902e-63fe-4216-afe8-cafbd2c26f99
+  
   alarmTargetTrackingASGWikiSubnet1AlarmLow2edbac39be0f41dba6f21272dd44dd64:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -516,7 +590,7 @@ Resources:
         DO NOT EDIT OR DELETE. For TargetTrackingScaling policy
         arn:aws:autoscaling:sa-east-1:553472697617:scalingPolicy:1e9e8dae-58b2-43f9-bceb-6d70b7e20d83:autoScalingGroupName/ASGWikiSubnet1:policyName/Scale
         Group Size.
-      ComparisonOperator: LessThanThreshold
+      ComparisonOperator: GreaterThanThreshold
       EvaluationPeriods: '15'
       MetricName: CPUUtilization
       Namespace: AWS/EC2
@@ -531,6 +605,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d4d6eb9c-c7f1-455b-8d50-b6ef0a81be81
+  
   alarmTargetTrackingASGWikiSubnet2AlarmHighe951a4062e554820aa2af8149a132205:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -554,6 +629,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 96e1295b-66ed-4a38-802d-4271706fd868
+  
   alarmTargetTrackingASGWikiSubnet2AlarmLowc154d0b7e53f4f5cb1fa4e7a4aa126b4:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -577,6 +653,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 94559f13-98bf-42e3-b247-46725901c3e7
+
+#############
+# Regras ACLs
+ 
   acl1:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
@@ -589,6 +669,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 8892fef0-7984-4b5b-a4e1-0a207d6e2c75
+  
   acl2:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
@@ -600,6 +681,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 8e0c7778-c0a9-474e-9b34-db3dd3692d22
+  
   acl3:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
@@ -612,6 +694,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 7cbd36ad-94b5-4ced-9574-e8bfd5793797
+  
   acl4:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
@@ -623,6 +706,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ccab0735-e3f3-44bb-a265-465f9b0f7cda
+
+##############################################################################################
+# Associação das ACLs (ACLDB/ACLAPP) com as Subnets (DbSubnet1/DbSubnet2/AppSubnet1/AppSubnet2)
+ 
   subnetacl1:
     Type: 'AWS::EC2::SubnetNetworkAclAssociation'
     Properties:
@@ -631,6 +718,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 64d51009-8665-4248-8084-edffb2eaa73a
+  
   subnetacl2:
     Type: 'AWS::EC2::SubnetNetworkAclAssociation'
     Properties:
@@ -639,6 +727,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 9d9dc2c4-e3af-42a8-afc4-4113e60d9280
+  
   subnetacl3:
     Type: 'AWS::EC2::SubnetNetworkAclAssociation'
     Properties:
@@ -647,6 +736,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 1fe05dcd-4119-4ddf-90ec-38b6a858fde8
+  
   subnetacl4:
     Type: 'AWS::EC2::SubnetNetworkAclAssociation'
     Properties:
@@ -655,6 +745,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 52fae126-0435-4dc6-844d-532d3af4b78d
+
+##############################################
+# Associação do Gateway de internet com o VPC
+  
   gw1:
     Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
@@ -663,6 +757,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 06585df1-3ca4-49ff-9d84-6020d45961b0
+
+####################################################################
+# Associação das rotas de redes (RTDB/RTInternet) com as Subnets (DbSubnet1/DbSubnet2/AppSubnet1/AppSubnet2)
+ 
   subnetroute1:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
@@ -671,6 +769,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 78eee39d-24ca-4d0c-bab1-c4762b756b05
+  
   subnetroute2:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
@@ -679,6 +778,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: a97b1933-d9a0-4c61-96e4-672197a8ba76
+  
   subnetroute4:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
@@ -687,6 +787,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 33dee37f-2a26-4d8a-bf38-8d483c058ded
+  
   subnetroute5:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
@@ -695,6 +796,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: fb937aa6-9a4a-4629-9b68-3ea33770cefb
+  
   route1:
     Type: 'AWS::EC2::Route'
     Properties:
@@ -703,6 +805,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 832c22eb-e4fc-4830-81f0-2197f305a66c
+  
   route2:
     Type: 'AWS::EC2::Route'
     Properties:
@@ -713,6 +816,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: aab9830c-ff98-4363-8693-fcf0061a2367
+
+##################################
+# Associação do DHCP com o WikiVPC
+
   dchpassoc1:
     Type: 'AWS::EC2::VPCDHCPOptionsAssociation'
     Properties:
@@ -721,6 +828,10 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 488696b5-e29a-4e96-ac29-108ffadb42f7
+
+######################################################################
+# Regras de Ingress e Egress dos Security Groups (WikiDbSG e WikiAppSG)
+
   ingress1:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -729,6 +840,7 @@ Resources:
       FromPort: '22'
       ToPort: '22'
       CidrIp: 192.168.1.0/26
+  
   ingress2:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -737,6 +849,7 @@ Resources:
       FromPort: '4444'
       ToPort: '4444'
       CidrIp: 192.168.1.0/26
+  
   ingress3:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -745,6 +858,7 @@ Resources:
       FromPort: '4567'
       ToPort: '4567'
       CidrIp: 192.168.1.0/26
+  
   ingress4:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -753,6 +867,7 @@ Resources:
       FromPort: '4568'
       ToPort: '4568'
       CidrIp: 192.168.1.0/26
+  
   ingress5:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -761,6 +876,7 @@ Resources:
       FromPort: '4567'
       ToPort: '4567'
       CidrIp: 192.168.1.0/26
+  
   ingress6:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -769,6 +885,7 @@ Resources:
       FromPort: '3306'
       ToPort: '3306'
       CidrIp: 192.168.1.0/26
+  
   ingress7:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -777,6 +894,7 @@ Resources:
       FromPort: '-1'
       ToPort: '-1'
       CidrIp: 192.168.1.0/26
+  
   ingress8:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -785,6 +903,7 @@ Resources:
       FromPort: '80'
       ToPort: '80'
       CidrIp: 0.0.0.0/0
+  
   ingress9:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
@@ -793,18 +912,24 @@ Resources:
       FromPort: '22'
       ToPort: '22'
       CidrIp: 0.0.0.0/0
+  
   egress1:
     Type: 'AWS::EC2::SecurityGroupEgress'
     Properties:
       GroupId: !Ref WikiDbSG
       IpProtocol: '-1'
       CidrIp: 0.0.0.0/0
+  
   egress2:
     Type: 'AWS::EC2::SecurityGroupEgress'
     Properties:
       GroupId: !Ref WikiAppSG
       IpProtocol: '-1'
       CidrIp: 0.0.0.0/0
+
+################################################################################
+# Criação da infraestrutura de LoadBalancers (Listeners/LoadBalancer/TargetGroup)
+
   LBDBTargerGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
@@ -830,6 +955,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: b64d1018-bcc2-4b50-b169-ea74bbdc4734
+  
   LBDB:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
@@ -847,7 +973,9 @@ Resources:
         - !Ref WikiDbSG
     Metadata:
       'AWS::CloudFormation::Designer':
-        id: ae6aa2d9-c5f3-416a-a6e9-2e366450fbc5
+  
+      id: ae6aa2d9-c5f3-416a-a6e9-2e366450fbc5
+  
   LBListener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
@@ -857,52 +985,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 4ab143e5-17fa-4816-84af-c6b611d9ce49
-  NatWikiDBeast1a:
-    Type: 'AWS::EC2::NatGateway'
-    Properties:
-      AllocationId:
-        'Fn::GetAtt':
-          - NatIP1
-          - AllocationId
-      SubnetId: !Ref AppSubnet2
-      Tags:
-        - Key: Name
-          Value: Nat-wikidb-sa-east-1a
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 308cbc38-a8f6-40af-b292-d062079ca643
-  NatIP1:
-    DependsOn:
-      - RTInternet
-    Type: 'AWS::EC2::EIP'
-    Properties:
-      Domain: WikiVPC
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: ae93fbaa-bbee-47f5-93de-522193ff8664
-  NatWikiDBeast1c:
-    Type: 'AWS::EC2::NatGateway'
-    Properties:
-      AllocationId:
-        'Fn::GetAtt':
-          - NatIP2
-          - AllocationId
-      SubnetId: !Ref AppSubnet1
-      Tags:
-        - Key: Name
-          Value: Nat-wikidb-sa-east-1c
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 98b7f113-20f4-489a-a1ad-049c3a50eb2d
-  NatIP2:
-    DependsOn:
-      - RTInternet
-    Type: 'AWS::EC2::EIP'
-    Properties:
-      Domain: WikiVPC
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 438ac207-df8f-4e3b-932a-e57599dab523
+    
   LBApp:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
@@ -918,6 +1001,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 61e64420-ed3f-4a43-b35a-c9260a1a5c5f
+  
   LBAppListener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
@@ -927,6 +1011,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 8af7aec3-8950-44c5-bb16-13039a75a612
+  
   LBAppTargerGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
@@ -951,6 +1036,63 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 3d9fba98-bf2d-45eb-8222-37712b41ab16
+
+####################################################################################################
+# Criação dos NAT Gateways (a fim de possibilitar a comunicação das subnets internas com a internet)
+
+  NatWikiDBeast1a:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId:
+        'Fn::GetAtt':
+          - NatIP1
+          - AllocationId
+      SubnetId: !Ref AppSubnet2
+      Tags:
+        - Key: Name
+          Value: Nat-wikidb-sa-east-1a
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 308cbc38-a8f6-40af-b292-d062079ca643
+  
+  NatIP1:
+    DependsOn:
+      - RTInternet
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: WikiVPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ae93fbaa-bbee-47f5-93de-522193ff8664
+  
+  NatWikiDBeast1c:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId:
+        'Fn::GetAtt':
+          - NatIP2
+          - AllocationId
+      SubnetId: !Ref AppSubnet1
+      Tags:
+        - Key: Name
+          Value: Nat-wikidb-sa-east-1c
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 98b7f113-20f4-489a-a1ad-049c3a50eb2d
+  
+  NatIP2:
+    DependsOn:
+      - RTInternet
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: WikiVPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 438ac207-df8f-4e3b-932a-e57599dab523
+
+#######################################################################
+# Bloco de metadados para visualização do Desing no AWS CloudFormation
+
 Description: ''
 Metadata:
   'AWS::CloudFormation::Designer':
