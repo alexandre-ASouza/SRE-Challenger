@@ -175,7 +175,6 @@ Resources:
           Ebs:
             SnapshotId: snap-080ecd9d6d2127220
             VolumeSize: 8
-      ClassicLinkVPCId: !Ref WikiVPC
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 63e6935b-0799-409f-a0f1-09c640a7c680
@@ -194,8 +193,7 @@ Resources:
         - DeviceName: /dev/sda1
           Ebs:
             SnapshotId: snap-080ecd9d6d2127220
-            VolumeSize: 8
-      ClassicLinkVPCId: !Ref WikiVPC
+            VolumeSize: 8     
     Metadata:
       'AWS::CloudFormation::Designer':
         id: afaab81d-945e-45a1-bad5-27f6b418a0da
