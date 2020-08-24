@@ -847,6 +847,9 @@ Resources:
   LBListener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
+      DefaultActions:
+        - Type: forward
+          !Ref LBDBTargerGroup
       Protocol: tcp
       LoadBalancerArn: !Ref LBDB
       Port: 3306
