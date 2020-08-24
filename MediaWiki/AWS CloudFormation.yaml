@@ -698,6 +698,9 @@ Resources:
   route1:
     Type: 'AWS::EC2::Route'
     Properties:
+      NatGatewayId:
+        - NatWikiDBeast1a
+        - NatWikiDBeast1c
       DestinationCidrBlock: 0.0.0.0/0
       RouteTableId: !Ref RTDB
     Metadata:
