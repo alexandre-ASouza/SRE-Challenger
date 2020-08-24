@@ -193,7 +193,7 @@ Resources:
         - DeviceName: /dev/sda1
           Ebs:
             SnapshotId: snap-080ecd9d6d2127220
-            VolumeSize: 8     
+            VolumeSize: 8
     Metadata:
       'AWS::CloudFormation::Designer':
         id: afaab81d-945e-45a1-bad5-27f6b418a0da
@@ -821,9 +821,9 @@ Resources:
             - !Ref DbWikiNode1
             - !Ref DbWikiNode2
             - !Ref DbWikiNode3
-        - 'Fn::GetAtt':
-            - LBDB
-            - LoadBalancerName
+        - !GetAtt 
+          - LBDB
+          - LoadBalancerName
         - Port: 3305
       Protocol: TCP
       Port: 3306
@@ -838,7 +838,7 @@ Resources:
       IpAddressType: ipv4
       Type: network
       Scheme: internal
-      SubnetMappings:
+      Subnets:
         - !Ref DbSubnet1
         - !Ref DbSubnet2
       SecurityGroups:
@@ -858,10 +858,9 @@ Resources:
   NatWikiDBeast1a:
     Type: 'AWS::EC2::NatGateway'
     Properties:
-      AllocationId:
-        'Fn::GetAtt':
-          - NatIP1
-          - AllocationId
+      AllocationId: !GetAtt 
+        - NatIP1
+        - AllocationId
       SubnetId: !Ref AppSubnet2
       Tags:
         - Key: Name
@@ -881,10 +880,9 @@ Resources:
   NatWikiDBeast1c:
     Type: 'AWS::EC2::NatGateway'
     Properties:
-      AllocationId:
-        'Fn::GetAtt':
-          - NatIP2
-          - AllocationId
+      AllocationId: !GetAtt 
+        - NatIP2
+        - AllocationId
       SubnetId: !Ref AppSubnet1
       Tags:
         - Key: Name
@@ -908,10 +906,9 @@ Resources:
       IpAddressType: ipv4
       Type: application
       Scheme: internet-facing
-      SubnetMappings:
-        SubnetId: 
-          - !Ref AppSubnet1
-          - !Ref AppSubnet2
+      Subnets:
+        - !Ref AppSubnet1
+        - !Ref AppSubnet2
       SecurityGroups:
         - !Ref WikiAppSG
     Metadata:
@@ -941,9 +938,9 @@ Resources:
         - stickiness.lb_cookie.duration_seconds: 60
       Targets:
         - Port: 80
-        - 'Fn::GetAtt':
-            - LBApp
-            - LoadBalancerName
+        - !GetAtt 
+          - LBApp
+          - LoadBalancerName
       Protocol: HTTP
       Port: 80
       VpcId: !Ref WikiVPC
