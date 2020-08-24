@@ -841,8 +841,6 @@ Resources:
       Subnets:
         - !Ref DbSubnet1
         - !Ref DbSubnet2
-      SecurityGroups:
-        - !Ref WikiDbSG
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ae6aa2d9-c5f3-416a-a6e9-2e366450fbc5
