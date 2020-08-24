@@ -836,8 +836,6 @@ Resources:
   LBDB:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
-      LoadBalancerAttributes:
-        - load_balancing.cross_zone.enabled: true
       Name: LB-DB-Wiki
       IpAddressType: ipv4
       Type: network
