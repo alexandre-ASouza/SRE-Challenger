@@ -124,7 +124,8 @@ Resources:
     Properties:
       AvailabilityZones:
         - sa-east-1a
-      TargetGroupARNs: !Ref LBAppTargerGroup
+      TargetGroupARNs:
+        - !Ref LBAppTargerGroup
       Cooldown: '300'
       DesiredCapacity: '1'
       HealthCheckGracePeriod: '300'
@@ -144,7 +145,8 @@ Resources:
     Properties:
       AvailabilityZones:
         - sa-east-1c
-      TargetGroupARNs: !Ref LBAppTargerGroup
+      TargetGroupARNs: 
+        - !Ref LBAppTargerGroup
       Cooldown: '300'
       DesiredCapacity: '1'
       HealthCheckGracePeriod: '300'
@@ -366,6 +368,10 @@ Resources:
       PolicyType: TargetTrackingScaling
       StepAdjustments: []
       AutoScalingGroupName: !Ref ASGWikiSubnet2
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 80
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 59d59092-9f02-4936-a885-b08bf4ba36e6
@@ -697,8 +703,8 @@ Resources:
     Type: 'AWS::EC2::Route'
     Properties:
       NatGatewayId:
-        - !Ref NatWikiDBeast1a
-        - !Ref NatWikiDBeast1c
+        Ref: NatWikiDBeast1a
+        Ref: NatWikiDBeast1c
       DestinationCidrBlock: 0.0.0.0/0
       RouteTableId: !Ref RTDB
     Metadata:
@@ -817,16 +823,9 @@ Resources:
       UnhealthyThresholdCount: 3
       TargetType: instance
       Targets:
-        - Id
-        - !Ref DbWikiNode1
-        - Id
-        - !Ref DbWikiNode2
-        - Id
-        - !Ref DbWikiNode3
-        - !GetAtt 
-          - LBDB
-          - LoadBalancerName
-        - Port: 3305
+        - Id: !Ref DbWikiNode1
+        - Id: !Ref DbWikiNode2
+        - Id: !Ref DbWikiNode3
       Protocol: TCP
       Port: 3306
       VpcId: !Ref WikiVPC
@@ -836,7 +835,7 @@ Resources:
   LBDB:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
-      Name: LB-DB-Wiki
+      Name: LB-Wiki-DB
       IpAddressType: ipv4
       Type: network
       Scheme: internal
@@ -851,8 +850,8 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-        - !Ref LBDBTargerGroup
-      Protocol: tcp
+          TargetGroupArn: !Ref LBDBTargerGroup
+      Protocol: TCP
       LoadBalancerArn: !Ref LBDB
       Port: 3306
     Metadata:
@@ -905,7 +904,7 @@ Resources:
   LBApp:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
-      Name: LB-App-Wiki
+      Name: LB-Wiki-App
       IpAddressType: ipv4
       Type: application
       Scheme: internet-facing
@@ -922,7 +921,7 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-        - !Ref LBAppTargerGroup
+          TargetGroupArn: !Ref LBAppTargerGroup
       Protocol: HTTP
       LoadBalancerArn: !Ref LBApp
       Port: 80
@@ -939,14 +938,8 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       UnhealthyThresholdCount: 2
       TargetType: instance
-      Matcher: "200,301"
-      TargetGroupAttributes:
-        - stickiness.lb_cookie.duration_seconds: 60
-      Targets:
-        - Port: 80
-        - !GetAtt 
-          - LBApp
-          - LoadBalancerName
+      Matcher:
+        HttpCode: '200,301'
       Protocol: HTTP
       Port: 80
       VpcId: !Ref WikiVPC
