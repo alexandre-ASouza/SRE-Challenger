@@ -817,10 +817,12 @@ Resources:
       UnhealthyThresholdCount: 3
       TargetType: instance
       Targets:
-        - Id:
-            - !Ref DbWikiNode1
-            - !Ref DbWikiNode2
-            - !Ref DbWikiNode3
+        - Id
+        - !Ref DbWikiNode1
+        - Id
+        - !Ref DbWikiNode2
+        - Id
+        - !Ref DbWikiNode3
         - !GetAtt 
           - LBDB
           - LoadBalancerName
@@ -849,7 +851,7 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          !Ref LBDBTargerGroup
+        - !Ref LBDBTargerGroup
       Protocol: tcp
       LoadBalancerArn: !Ref LBDB
       Port: 3306
@@ -920,7 +922,7 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          !Ref LBAppTargerGroup
+        - !Ref LBAppTargerGroup
       Protocol: HTTP
       LoadBalancerArn: !Ref LBApp
       Port: 80
