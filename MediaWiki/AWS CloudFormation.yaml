@@ -918,6 +918,9 @@ Resources:
   LBAppListener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
+      DefaultActions:
+        - Type: forward
+          !Ref LBAppTargerGroup
       Protocol: HTTP
       LoadBalancerArn: !Ref LBApp
       Port: 80
