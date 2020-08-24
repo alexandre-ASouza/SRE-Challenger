@@ -914,8 +914,8 @@ Resources:
       Type: application
       Scheme: internet-facing
       SubnetMappings:
-        - 192.168.1.0/28
-        - 192.168.1.16/28
+        - AppSubnet1
+        - AppSubnet2
       SecurityGroups:
         - !Ref WikiAppSG
     Metadata:
