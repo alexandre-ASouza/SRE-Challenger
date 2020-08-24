@@ -837,8 +837,7 @@ Resources:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
       LoadBalancerAttributes:
-        Key: load_balancing.cross_zone.enabled
-        Value: true
+        - load_balancing.cross_zone.enabled: true
       Name: LB-DB-Wiki
       IpAddressType: ipv4
       Type: network
@@ -914,8 +913,9 @@ Resources:
       Type: application
       Scheme: internet-facing
       SubnetMappings:
-        - AppSubnet1
-        - AppSubnet2
+        SubnetId: 
+          - !Ref AppSubnet1
+          - !Ref AppSubnet2
       SecurityGroups:
         - !Ref WikiAppSG
     Metadata:
