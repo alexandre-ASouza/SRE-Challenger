@@ -937,7 +937,7 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       UnhealthyThresholdCount: 2
       TargetType: instance
-      Matcher: '200,301'
+      Matcher: "200,301"
       TargetGroupAttributes:
         - stickiness.lb_cookie.duration_seconds: 60
       Targets:
