@@ -839,9 +839,8 @@ Resources:
       Type: network
       Scheme: internal
       SubnetMappings:
-        PrivateIPv4Address:
-          - 192.168.1.54
-          - 192.168.1.44
+        - !Ref DbSubnet1
+        - !Ref DbSubnet2
       SecurityGroups:
         - !Ref WikiDbSG
     Metadata:
